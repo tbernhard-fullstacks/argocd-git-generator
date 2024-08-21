@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cluster-applicationsets
+  namespace: argocd
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/tbernhard-fullstacks/argocd-git-generator
+        revision: main
+        directories:
+          - path: clusters/**/applicationsets
+  template:
+    metadata:
+      name: '{{path[1]}}-applicationsets'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/tbernhard-fullstacks/argocd-git-generator
+        targetRevision: main
+        path: '{{path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: argocd
+      syncPolicy:
+        automated:
+          prune: true
